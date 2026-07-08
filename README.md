@@ -1,173 +1,83 @@
+# ⚽ Football Prediction System V3.0
 
-# ⚽ Football Prediction
-<p align="center">
-  <a href="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1">
-      <img src="./img/rdm.png" alt="Football Prediction Logo" width="500" />
-  </a>
-</p>
+> **6 大核心算法 · 可直接集成 · 5 套系统隔离跑**
 
-## 🔣 Language & Tools
-[![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://www.python.org) [![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white)](https://pandas.pydata.org/) [![Airflow](https://img.shields.io/badge/airflow-%2300C7B7.svg?style=for-the-badge&logo=apache-airflow&logoColor=white)](https://airflow.apache.org) [![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/) [![Scikit-Learn](https://img.shields.io/badge/scikit--learn-%23F7931E.svg?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/stable/)
+## 🏛️ 核心算法模块
 
-## 📝 Project Description
+| 模块 | 文件 | 说明 |
+|------|------|------|
+| **Poisson 泊松模型** | `utils/poisson_model.py` | 1X2/O-U/BTTS 概率 + S1 初筛价值检测 |
+| **Dixon-Coles 双泊松** | `utils/dc_model.py` | 低分修正 + 时间衰减 + 环境修正 + 负二项 |
+| **Bayesian 可信区间** | `utils/bayesian_model.py` | 后验不确定性估计 |
+| **Kelly 仓位管理** | `utils/money_management.py` | 1/2/1/4 Kelly + 2% 熔断 + 组合风控 |
+| **ELO 评分系统** | `utils/team_strength.py` | 动态评分 + 理论盘口 + S1 初筛报警 |
 
-This project aims to predict the outcomes of football matches using a **Random Forest Classifier**. By scraping data from **football-data.co.uk**, we create datasets with relevant match statistics, train a model, and use it to predict upcoming football matches.
-
-The project is structured into different modules for scraping data, processing and updating databases, training models, and making predictions. Data is organized and processed using **Airflow** DAGs to ensure timely updates, and predictions are made based on **team form**, **match statistics**, and **betting odds**.
-
-## 📚 Table of Contents
-- [📝 Project Description](#-project-description)
-- [💻 Installation](#-installation)
-- [🏃‍♂ How to Run (Manual)](#-how-to-run-manual)
-- [🏃‍♂️ How to Run (Airflow)](#-how-to-run-airflow)
-- [🗂️ Directory Structure](#-directory-structure)
-- [🎓 Team Members](#-team-members)
-
-## 💻 Installation
-
-1. Clone the repository:
-    ```bash
-    git clone https://github.com/Atome1212/football-prediction.git
-    cd football-prediction
-    ```
-
-2. Install dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
-3. Create csv and models folder:
-    ```bash
-    mkdir csv
-    mkdir models
-    ```
-
-4. Start the scrapper for getting csv:
-   ```bash
-    cd football-prediction/utils/
-    python scrap.py
-   ```
-
-5. [Setup **MySQL** for the database:](https://www.youtube.com/watch?v=u96rVINbAUI&ab_channel=WebDevSimplified):
-   ```sql
-    CREATE DATABASE football_prediction;
-   ```
-   Fill in the following fields in the db_creation.py script:
-   ```bash
-    host = 'localhost'   # MySQL server address (e.g., localhost)
-    port = 3306          # MySQL port (usually 3306)
-    user = 'root'        # MySQL username
-    password = 'password'  # MySQL password
-    database = 'football_prediction'  # Database name
-   ```
-
-   The necessary tables to store match data, statistics, and updates are defined in the script.
-       The following tables will be created: <br>
-            - teams: Stores team information <br>
-            -  matches: Stores match details <br>
-            - full_time_results: Stores full-time results of the match <br>
-            - half_time_results: Stores half-time results of the match <br>
-            - match_statistics: Stores match statistics (cards, corners, etc.) <br>
-            - match_odds: Stores betting odds for each match <br>
-            - csv_updates: Stores updated CSV lines <br>
-
-   Run the script to create these tables:
-   ```bash
-     python db_creation.py
-   ```
-6. [Install & Setup Airflow:](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html)
-   Install Airflow using pip:
-      ```bash
-        pip install apache-airflow
-      ```
-
-   Initialize the Airflow database:
-      ```bash
-        airflow db init
-      ```
-
-   Create an Airflow user:
-      ```bash
-        airflow users create \
-        --username admin \
-        --firstname FIRST_NAME \
-        --lastname LAST_NAME \
-        --role Admin \
-        --email admin@example.com
-      ```
-  
-
-## 🏃‍♂️ How to Run (Manual)
-1. Start the scrapper for getting new csv:
-   ```bash
-    cd football-prediction/utils/
-    python scrap.py
-   ```
-2. Update the Data base:
-   ```bash
-    cd football-prediction/utils/
-    python update.py
-   ```
-
-3. Use the **Random Forest Classifier** model for predictions:
-   ```bash
-    cd football-prediction/utils/
-    python modelling_soccer.py
-   ```
-
-## 🏃‍♂️ How to Run (Airflow)
-1. Run **Airflow** DAG to start data scraping and updating and training:
-    Start the Airflow web server:
-      ```bash
-        airflow webserver --port 8080
-      ```
-      
-    Start the Airflow scheduler:
-      ```bash
-        airflow scheduler
-      ```
-2. Access the Airflow UI at **http://localhost:8080** and trigger your DAG.
-
-
-## 🗂️ Directory Structure
+## 🚀 快速开始
 
 ```bash
-/football-prediction
-├── dags
-│   └── dag.py                         # Airflow DAG for scraping, updating DB, and training model
-├── utils
-│   ├── db_connection.py               # Database connection functions
-│   ├── db_creation.py                 # Script for creating database tables
-│   ├── scrap.py                       # Functions for scraping football data
-│   ├── update.py                      # Functions for updating the database with new data
-│   ├── modelling_soccer.py            # Football prediction model training and prediction
-├── logos                              # Directory for storing football team logos
-│   ├── Anderlecht.png
-│   ├── Antwerp.png
-│   ├── Beerschot VA.png
-│   ├── Cercle Brugge.png
-│   ├── Charleroi.png
-│   ├── Club Brugge.png
-│   ├── Dender.png
-│   ├── Genk.png
-│   ├── Gent.png
-│   ├── Kortrijk.png
-│   ├── Mechelen.png
-│   ├── Oud-Heverlee Leuven.png
-│   ├── St Truiden.png
-│   ├── St. Gilloise.png
-│   ├── Standard.png
-│   ├── Westerlo.png
-│   └── jupiler_pro_league.jpg
-├── img                                # Directory for storing miscellaneous images
-├── csv                                # Directory for storing scraped CSV files
-├── models                             # Directory for storing trained models
-├── deploy_soccer.py                   # Script for deployment
-└── requirements.txt                   # Python package dependencies
+# 安装依赖
+pip install numpy scipy
+
+# 使用 Poisson 模型
+python3 -c "
+from utils.poisson_model import PoissonDistribution
+m = PoissonDistribution(1.65, 0.80)
+print(m.summary())
+v = m.value_edge({'home':1.55,'draw':4.0,'away':6.5})
+print('Value edges:', v['flagged'])
+"
+
+# 使用 Dixon-Coles 模型
+python3 -c "
+from utils.dc_model import DixonColesModel, MatchRecord
+model = DixonColesModel(half_life_days=730)
+model.add_match(MatchRecord('2024-03-10', '曼城', '利物浦', 2, 1))
+# ... 灌更多历史数据
+model.fit()
+print(model.predict('曼城', '利物浦').summary())
+"
+
+# 使用 ELO 初筛
+python3 -c "
+from utils.team_strength import TeamStrength
+ts = TeamStrength()
+ts.update_result('曼城', '利物浦', 2, 1)
+print(ts.theory_handicap('曼城', '利物浦'))
+print(ts.s1_screen(-0.75, '曼城', '利物浦'))
+"
+
+# 使用 Kelly 算仓
+python3 -c "
+from utils.money_management import MoneyManagement
+mm = MoneyManagement(bankroll=10000, max_single_stake_pct=0.02)
+k = mm.kelly_stake(prob=0.55, odds=1.80, fraction=0.25)
+print(k)
+"
 ```
 
-## 🎓 Team Members
+## Streamlit 交互式 Dashboard
 
-- **👷‍♂️ [Atome1212](https://github.com/Atome1212)**: Data Engineer
-- **👷‍♀️ [ezgitandogan](https://github.com/ezgitandogan)**: Data Engineer
-- **👨‍💻 [Siegfried2021](https://github.com/Siegfried2021)**: Data Analyst
-- **👩‍💻 [GeorginaAG](https://github.com/GeorginaAG)**: Data Analyst
+```bash
+pip install streamlit
+streamlit run app.py
+```
+
+## 📊 算法对比
+
+```
+Poisson:       独立双泊松, 快速, 适合初筛
+Dixon-Coles:   双泊松 + 低分修正 + 环境修正, 更精确
+Bayesian:      后验可信区间, 量化不确定性
+ELO:           动态评分 + 理论盘口, 初筛"可能有鬼"
+Kelly:         1/4 Kelly 仓位, 2% 硬性熔断
+```
+
+## 📁 参考项目
+
+- [turingism/worldcup-predictor](https://github.com/turingism/worldcup-predictor) — Dixon-Coles 双泊松
+- [AmirMotefaker/ai-football-prediction-engine](https://github.com/AmirMotefaker/ai-football-prediction-engine-world-cup-2026) — 环境修正
+- [tdfarrell/betting-stake-optimizer](https://github.com/tdfarrell/betting-stake-optimizer) — Kelly 计算器
+
+## 📜 License
+
+MIT
